@@ -1010,6 +1010,10 @@ const STACK = [
 const shot = (url, w = 1440) => `https://s0.wp.com/mshots/v1/${encodeURIComponent(url)}?w=${w}&h=900`;
 const host = (url) => url.replace(/^https?:\/\//, '').replace(/\/$/, '');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Phones/tablets: show screenshots in the cards instead of live iframes.
+// Several full sites loading at once runs mobile browsers out of memory.
+// The live site still opens in the "Try it live" preview.
+const lite = matchMedia('(max-width: 1023px), (pointer: coarse)').matches;
 
 /* =========================================================
    SOUND EFFECTS — made with the Web Audio API (no files).
@@ -1125,12 +1129,12 @@ PROJECTS.forEach((p, i) => {
         <div class="screen">
           <div class="screen-fallback"><div><b>${p.name}</b><span>${host(p.url)}</span></div></div>
           <img class="shot" alt="Screenshot of ${p.name}" loading="lazy" data-src="${shot(p.url)}">
-          ${p.embed ? `<iframe title="${p.name} live site" tabindex="-1" loading="lazy" data-src="${p.url}" scrolling="no"></iframe>` : ''}
+          ${p.embed && !lite ? `<iframe title="${p.name} live site" tabindex="-1" loading="lazy" data-src="${p.url}" scrolling="no"></iframe>` : ''}
           <div class="screen-scan"></div>
           <div class="screen-hover"><span>Click to try it live</span></div>
         </div>
       </div>
-      ${p.phone ? `<div class="phone">${p.embed ? `<iframe title="${p.name} mobile" tabindex="-1" loading="lazy" data-src="${p.url}" scrolling="no"></iframe>` : ''}</div>` : ''}
+      ${p.phone ? `<div class="phone">${p.embed && !lite ? `<iframe title="${p.name} mobile" tabindex="-1" loading="lazy" data-src="${p.url}" scrolling="no"></iframe>` : `<img alt="" loading="lazy" data-src="https://s0.wp.com/mshots/v1/${encodeURIComponent(p.url)}?w=390&h=844">`}</div>` : ''}
     </div>`;
   track.appendChild(el);
 });
